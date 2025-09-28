@@ -73,15 +73,16 @@ class TelegramNotifier:
             
             # If HTML parsing fails, try with plain text
             try:
-                plain_message = f"🛋️ {product.title}\n\n"
+                plain_message = f"🛋️ *{product.title}*\n\n"
                 plain_message += f"💰 Цена: {product.price}\n"
-                plain_message += f"🔗 Ссылка: {product.link}\n\n"
+                plain_message += f"🔗 {product.link}\n\n"
                 plain_message += f"🆔 ID: {product.product_id}"
                 
                 if not dry_run:
                     await self.bot.send_message(
                         chat_id=self.chat_id,
                         text=plain_message,
+                        parse_mode=ParseMode.MARKDOWN,
                         reply_markup=keyboard,
                         disable_web_page_preview=False
                     )

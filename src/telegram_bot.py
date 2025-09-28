@@ -21,22 +21,33 @@ class TelegramNotifier:
         """Format product information into a Telegram message."""
         message = f"🛋️ <b>{product.title}</b>\n\n"
         message += f"💰 Цена: <code>{product.price}</code>\n"
-        message += f"🔗 <a href='{product.link}'>Посмотреть объявление</a>\n\n"
-        message += f"🆔 ID: {product.product_id}"
         
-        return message
+        # Add date if available
+        if product.date_posted:
+            message += f"📅 Опубликовано: {product.date_posted}\n"
+        
+        return message.rstrip()
     
     def create_inline_keyboard(self, product: Product) -> Optional[InlineKeyboardMarkup]:
-        """Create inline keyboard with Telegram link button."""
-        if not product.telegram_link:
-            return None
-            
-        keyboard = [[
+        """Create inline keyboard with buttons for product page and Telegram."""
+        keyboard = []
+        
+        # Add product page button
+        keyboard.append([
             InlineKeyboardButton(
-                text="💬 Посмотреть в Telegram",
-                url=product.telegram_link
+                text="🔗 Посмотреть объявление",
+                url=product.link
             )
-        ]]
+        ])
+        
+        # Add Telegram button if available
+        if product.telegram_link:
+            keyboard.append([
+                InlineKeyboardButton(
+                    text="💬 Посмотреть в Telegram",
+                    url=product.telegram_link
+                )
+            ])
         
         return InlineKeyboardMarkup(keyboard)
     
@@ -75,8 +86,12 @@ class TelegramNotifier:
             try:
                 plain_message = f"🛋️ *{product.title}*\n\n"
                 plain_message += f"💰 Цена: {product.price}\n"
-                plain_message += f"🔗 {product.link}\n\n"
-                plain_message += f"🆔 ID: {product.product_id}"
+                
+                # Add date if available
+                if product.date_posted:
+                    plain_message += f"📅 Опубликовано: {product.date_posted}\n"
+                
+                plain_message = plain_message.rstrip()
                 
                 if not dry_run:
                     await self.bot.send_message(

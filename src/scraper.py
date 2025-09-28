@@ -14,6 +14,7 @@ class Product:
     price: str
     link: str
     product_id: str
+    date_posted: Optional[str] = None
     telegram_link: Optional[str] = None
 
 class YarmarkaGeScraper:
@@ -23,6 +24,18 @@ class YarmarkaGeScraper:
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         })
+        
+        # Load cookies from environment
+        cookie_string = os.getenv('COOKIE_STRING')
+        if cookie_string:
+            # Parse cookie string into individual cookies
+            cookies = {}
+            for cookie in cookie_string.split('; '):
+                if '=' in cookie:
+                    key, value = cookie.split('=', 1)
+                    cookies[key] = value
+            self.session.cookies.update(cookies)
+            logger.info(f"Loaded {len(cookies)} cookies including geo=tbilisi")
         
         # Load keywords from environment variable
         keywords_str = os.getenv('SEARCH_KEYWORDS', 'стеллаж,стелаж,журнальный,столик,зеркало')
@@ -71,8 +84,9 @@ class YarmarkaGeScraper:
                     if not any(keyword.lower() in title_lower for keyword in self.keywords):
                         continue
                     
-                    # Find price - look in the parent container
+                    # Find price and date - look in the parent container
                     price = "N/A"
+                    date_posted = None
                     container = name_div.find_parent()
                     while container and price == "N/A":
                         price_elem = container.find('div', class_='product-list__price')
@@ -87,11 +101,30 @@ class YarmarkaGeScraper:
                         if not container or container.name == 'body':
                             break
                     
+                    # Find date - look in the productitem__footer
+                    container = name_div.find_parent()
+                    while container and not date_posted:
+                        # Look for productitem__footer that contains the date
+                        footer_elem = container.find('div', class_='productitem__footer')
+                        if footer_elem:
+                            # Find the text-right div that contains the date
+                            date_elem = footer_elem.find('div', class_='text-right')
+                            if date_elem:
+                                date_text = date_elem.get_text(strip=True)
+                                # Check if it looks like a date (contains common date patterns)
+                                if re.search(r'(назад|вчера|сегодня|\d{1,2}\.\d{1,2}\.\d{4}|\d{1,2} [а-я]+ \d{4})', date_text):
+                                    date_posted = date_text
+                            break
+                        container = container.find_parent()
+                        if not container or container.name == 'body':
+                            break
+                    
                     product = Product(
                         title=title,
                         price=price,
                         link=f"{self.base_url}{product_path}",
-                        product_id=product_id
+                        product_id=product_id,
+                        date_posted=date_posted
                     )
                     products.append(product)
                     logger.info(f"Found matching product: {title} - {price}")

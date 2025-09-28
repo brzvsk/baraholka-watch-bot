@@ -39,7 +39,11 @@ class BaraholkaWatchBot:
         # Load configuration
         self.bot_token = os.getenv('BOT_TOKEN')
         self.chat_id = os.getenv('CHAT_ID')
-        self.yarmarka_url = os.getenv('YARMARKA_URL', 'https://yarmarka.ge/goods/c_2438/0/0?sort=new')
+        
+        # Support multiple URLs
+        urls_str = os.getenv('YARMARKA_URLS', 'https://yarmarka.ge/goods/c_2438/0/0?sort=new')
+        self.yarmarka_urls = [url.strip() for url in urls_str.split(',') if url.strip()]
+        
         self.check_interval = int(os.getenv('CHECK_INTERVAL_MINUTES', 30))
         
         if not self.bot_token or not self.chat_id:
@@ -52,7 +56,7 @@ class BaraholkaWatchBot:
         
         logger.info(f"Bot initialized - Dry run: {self.dry_run}")
         logger.info(f"Check interval: {self.check_interval} minutes")
-        logger.info(f"Target URL: {self.yarmarka_url}")
+        logger.info(f"Target URLs: {', '.join(self.yarmarka_urls)}")
         
     def test_connection(self) -> bool:
         """Test Telegram bot connection."""
@@ -64,9 +68,15 @@ class BaraholkaWatchBot:
         try:
             logger.info(f"Starting product check at {datetime.now()}")
             
-            # Scrape products
-            logger.info("Scraping products...")
-            products = self.scraper.scrape_new_products(self.yarmarka_url)
+            # Scrape products from all URLs
+            logger.info(f"Scraping products from {len(self.yarmarka_urls)} categories...")
+            all_products = []
+            for url in self.yarmarka_urls:
+                logger.info(f"Scraping: {url}")
+                products = self.scraper.scrape_new_products(url)
+                all_products.extend(products)
+            
+            products = all_products
             
             if not products:
                 logger.info("No matching products found")

@@ -19,7 +19,7 @@ A Telegram bot that monitors yarmarka.ge for specific furniture items and sends 
 ```bash
 # Telegram Bot Configuration
 BOT_TOKEN=your_telegram_bot_token
-CHAT_ID=your_chat_id
+CHAT_ID=your_chat_id  # Use negative ID for groups: -1234567890
 
 # Scraping Configuration
 CHECK_INTERVAL_MINUTES=30
@@ -144,9 +144,13 @@ main.py                 # Application orchestrator
 
 ### Common Issues
 
-1. **"No products found"** → Website structure may have changed
-2. **"Bot connection failed"** → Check BOT_TOKEN and network
-3. **"No Telegram links"** → Product pages may have changed structure
+1. **"Chat not found"** → 
+   - For groups: Use negative chat ID (e.g., `-1234567890`)
+   - For private chats: Use positive chat ID (e.g., `1234567890`)
+   - Add bot to the target chat/group first
+2. **"No products found"** → Website structure may have changed
+3. **"Bot connection failed"** → Check BOT_TOKEN and network
+4. **"No Telegram links"** → Product pages may have changed structure
 
 ### Debug Mode
 

@@ -9,8 +9,9 @@ services:
       - BOT_TOKEN=${BOT_TOKEN}
       - CHAT_ID=${CHAT_ID}
       - CHECK_INTERVAL_MINUTES=${CHECK_INTERVAL_MINUTES:-30}
-      - YARMARKA_URL=${YARMARKA_URL:-https://yarmarka.ge/goods/c_2438/0/0?sort=new}
+      - YARMARKA_URLS=${YARMARKA_URLS:-https://yarmarka.ge/goods/c_2438/0/0?sort=new,https://yarmarka.ge/goods/c_2662/0/0?sort=new}
       - SEARCH_KEYWORDS=${SEARCH_KEYWORDS:-стеллаж,стелаж,журнальный,столик,зеркало}
+      - COOKIE_STRING=${COOKIE_STRING}
     volumes:
       # Mount data directory for persistent state storage
       - bot_data:/app/data

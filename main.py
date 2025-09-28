@@ -52,7 +52,7 @@ class BaraholkaWatchBot:
         # Initialize components
         self.scraper = YarmarkaGeScraper()
         self.telegram = TelegramNotifierSync(self.bot_token, self.chat_id)
-        self.state = StateManager()
+        self.state = StateManager(os.getenv("STATE_FILE", "sent_ads.json"))
         
         logger.info(f"Bot initialized - Dry run: {self.dry_run}")
         logger.info(f"Check interval: {self.check_interval} minutes")

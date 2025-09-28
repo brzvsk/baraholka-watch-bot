@@ -19,14 +19,14 @@ class TelegramNotifier:
     
     def format_message(self, product: Product) -> str:
         """Format product information into a Telegram message."""
-        message = f"🛋️ **{product.title}**\\n\\n"
-        message += f"💰 Цена: `{product.price}`\\n"
-        message += f"🔗 [Посмотреть объявление]({product.link})\\n"
+        message = f"🛋️ <b>{product.title}</b>\n\n"
+        message += f"💰 Цена: <code>{product.price}</code>\n"
+        message += f"🔗 <a href='{product.link}'>Посмотреть объявление</a>\n"
         
         if product.telegram_link:
-            message += f"📱 [Посмотреть в Telegram]({product.telegram_link})\\n"
+            message += f"📱 <a href='{product.telegram_link}'>Посмотреть в Telegram</a>\n"
         
-        message += f"\\n🆔 ID: {product.product_id}"
+        message += f"\n🆔 ID: {product.product_id}"
         
         return message
     
@@ -47,7 +47,7 @@ class TelegramNotifier:
             await self.bot.send_message(
                 chat_id=self.chat_id,
                 text=message,
-                parse_mode=ParseMode.MARKDOWN_V2,
+                parse_mode=ParseMode.HTML,
                 disable_web_page_preview=False
             )
             
@@ -58,16 +58,16 @@ class TelegramNotifier:
         except TelegramError as e:
             logger.error(f"Telegram error sending notification for {product.title}: {e}")
             
-            # If markdown parsing fails, try with plain text
+            # If HTML parsing fails, try with plain text
             try:
-                plain_message = f"🛋️ {product.title}\\n\\n"
-                plain_message += f"💰 Цена: {product.price}\\n"
-                plain_message += f"🔗 Ссылка: {product.link}\\n"
+                plain_message = f"🛋️ {product.title}\n\n"
+                plain_message += f"💰 Цена: {product.price}\n"
+                plain_message += f"🔗 Ссылка: {product.link}\n"
                 
                 if product.telegram_link:
-                    plain_message += f"📱 Telegram: {product.telegram_link}\\n"
+                    plain_message += f"📱 Telegram: {product.telegram_link}\n"
                 
-                plain_message += f"\\n🆔 ID: {product.product_id}"
+                plain_message += f"\n🆔 ID: {product.product_id}"
                 
                 if not dry_run:
                     await self.bot.send_message(

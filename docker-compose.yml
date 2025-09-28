@@ -12,9 +12,10 @@ services:
       - YARMARKA_URLS=${YARMARKA_URLS:-https://yarmarka.ge/goods/c_2438/0/0?sort=new,https://yarmarka.ge/goods/c_2662/0/0?sort=new}
       - SEARCH_KEYWORDS=${SEARCH_KEYWORDS:-стеллаж,стелаж,журнальный,столик,зеркало}
       - COOKIE_STRING=${COOKIE_STRING}
+      - STATE_FILE=${STATE_FILE:-/app/data/sent_ads.json}
     volumes:
       # Mount data directory for persistent state storage
-      - bot_data:/app/data
+      - ./data:/app/data
       # Mount logs for external access
       - ./logs:/app/logs
     env_file:
@@ -25,7 +26,3 @@ services:
       timeout: 30s
       retries: 3
       start_period: 30s
-
-volumes:
-  bot_data:
-    driver: local

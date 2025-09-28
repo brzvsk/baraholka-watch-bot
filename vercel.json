@@ -1,0 +1,18 @@
+{
+  "functions": {
+    "api/check.py": {
+      "runtime": "python3.9"
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/check",
+      "dest": "/api/check.py"
+    }
+  ],
+  "build": {
+    "env": {
+      "PYTHONPATH": "/var/task"
+    }
+  }
+}

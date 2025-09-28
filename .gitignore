@@ -41,3 +41,4 @@ bot.db
 # OS
 .DS_Store
 Thumbs.db
+.vercel

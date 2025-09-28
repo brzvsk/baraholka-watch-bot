@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from typing import Optional
-from telegram import Bot
+from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.error import TelegramError
 from telegram.constants import ParseMode
 import time
@@ -21,14 +21,24 @@ class TelegramNotifier:
         """Format product information into a Telegram message."""
         message = f"🛋️ <b>{product.title}</b>\n\n"
         message += f"💰 Цена: <code>{product.price}</code>\n"
-        message += f"🔗 <a href='{product.link}'>Посмотреть объявление</a>\n"
-        
-        if product.telegram_link:
-            message += f"📱 <a href='{product.telegram_link}'>Посмотреть в Telegram</a>\n"
-        
-        message += f"\n🆔 ID: {product.product_id}"
+        message += f"🔗 <a href='{product.link}'>Посмотреть объявление</a>\n\n"
+        message += f"🆔 ID: {product.product_id}"
         
         return message
+    
+    def create_inline_keyboard(self, product: Product) -> Optional[InlineKeyboardMarkup]:
+        """Create inline keyboard with Telegram link button."""
+        if not product.telegram_link:
+            return None
+            
+        keyboard = [[
+            InlineKeyboardButton(
+                text="💬 Посмотреть в Telegram",
+                url=product.telegram_link
+            )
+        ]]
+        
+        return InlineKeyboardMarkup(keyboard)
     
     async def send_notification(self, product: Product, dry_run: bool = False) -> bool:
         """Send notification about new product."""
@@ -39,15 +49,18 @@ class TelegramNotifier:
                 await asyncio.sleep(self.min_interval - (current_time - self.last_message_time))
             
             message = self.format_message(product)
+            keyboard = self.create_inline_keyboard(product)
             
             if dry_run:
-                logger.info(f"DRY RUN - Would send message:\\n{message}")
+                keyboard_info = f" with button: {product.telegram_link}" if keyboard else ""
+                logger.info(f"DRY RUN - Would send message{keyboard_info}:\n{message}")
                 return True
             
             await self.bot.send_message(
                 chat_id=self.chat_id,
                 text=message,
                 parse_mode=ParseMode.HTML,
+                reply_markup=keyboard,
                 disable_web_page_preview=False
             )
             
@@ -62,17 +75,14 @@ class TelegramNotifier:
             try:
                 plain_message = f"🛋️ {product.title}\n\n"
                 plain_message += f"💰 Цена: {product.price}\n"
-                plain_message += f"🔗 Ссылка: {product.link}\n"
-                
-                if product.telegram_link:
-                    plain_message += f"📱 Telegram: {product.telegram_link}\n"
-                
-                plain_message += f"\n🆔 ID: {product.product_id}"
+                plain_message += f"🔗 Ссылка: {product.link}\n\n"
+                plain_message += f"🆔 ID: {product.product_id}"
                 
                 if not dry_run:
                     await self.bot.send_message(
                         chat_id=self.chat_id,
                         text=plain_message,
+                        reply_markup=keyboard,
                         disable_web_page_preview=False
                     )
                 

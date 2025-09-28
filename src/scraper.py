@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import logging
 import re
+import os
 from typing import List, Dict, Optional
 from dataclasses import dataclass
 
@@ -23,8 +24,10 @@ class YarmarkaGeScraper:
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         })
         
-        # Keywords to search for (hardcoded as requested)
-        self.keywords = ["стеллаж", "стелаж", "журнальный", "столик", "зеркало"]
+        # Load keywords from environment variable
+        keywords_str = os.getenv('SEARCH_KEYWORDS', 'стеллаж,стелаж,журнальный,столик,зеркало')
+        self.keywords = [keyword.strip() for keyword in keywords_str.split(',') if keyword.strip()]
+        logger.info(f"Loaded search keywords: {self.keywords}")
     
     def fetch_listings(self, url: str) -> List[Product]:
         """Fetch and parse product listings from the main page."""

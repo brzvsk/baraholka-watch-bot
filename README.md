@@ -4,10 +4,12 @@ A Telegram bot that monitors yarmarka.ge for specific furniture items and sends 
 
 ## Features
 
-- 🔍 **Smart Scraping**: Monitors https://yarmarka.ge/goods/c_2438/0/0?sort=new every 30 minutes
-- 🏠 **Furniture Focus**: Searches for items containing: "стеллаж", "стелаж", "журнальный", "столик", "зеркало"
+- 🔍 **Smart Scraping**: Monitors yarmarka.ge listings every 30 minutes (configurable)
+- 🔎 **Configurable Search**: Customizable keywords via environment variables  
+- 🏠 **Furniture Focus**: Default search for стеллаж, стелаж, журнальный, столик, зеркало
 - 📱 **Telegram Integration**: Sends rich messages with prices, links, and Telegram chat links
 - 🚫 **Duplicate Prevention**: Tracks sent ads to avoid spam
+- 🔒 **Secure**: All secrets stored in environment variables
 - 🐳 **Docker Ready**: Fully containerized for easy deployment
 
 ## Quick Start
@@ -15,10 +17,14 @@ A Telegram bot that monitors yarmarka.ge for specific furniture items and sends 
 ### Environment Variables
 
 ```bash
-BOT_TOKEN=8045994724:AAECxH8TtK_fYiaTXwPv7ACzBf0xRht2AIY
-CHAT_ID=4938173866
+# Telegram Bot Configuration
+BOT_TOKEN=your_telegram_bot_token
+CHAT_ID=your_chat_id
+
+# Scraping Configuration
 CHECK_INTERVAL_MINUTES=30
 YARMARKA_URL=https://yarmarka.ge/goods/c_2438/0/0?sort=new
+SEARCH_KEYWORDS=стеллаж,стелаж,журнальный,столик,зеркало
 ```
 
 ### Local Testing
@@ -71,9 +77,14 @@ YARMARKA_URL=https://yarmarka.ge/goods/c_2438/0/0?sort=new
 
 #### Environment Variables to Set in Coolify:
 ```
-BOT_TOKEN=8045994724:AAECxH8TtK_fYiaTXwPv7ACzBf0xRht2AIY
-CHAT_ID=4938173866
+# Required
+BOT_TOKEN=your_telegram_bot_token
+CHAT_ID=your_chat_id
+
+# Optional (with defaults)
 CHECK_INTERVAL_MINUTES=30
+SEARCH_KEYWORDS=стеллаж,стелаж,журнальный,столик,зеркало
+YARMARKA_URL=https://yarmarka.ge/goods/c_2438/0/0?sort=new
 ```
 
 #### Coolify Configuration:
@@ -145,21 +156,45 @@ export LOGGING_LEVEL=DEBUG
 python main.py --once --dry-run
 ```
 
-## Development
+## Configuration
 
-### Adding Keywords
+### Search Keywords
 
-Edit `src/scraper.py`:
-```python
-self.keywords = ["стеллаж", "стелаж", "журнальный", "столик", "зеркало", "новое_слово"]
-```
+Customize what items to search for by setting the `SEARCH_KEYWORDS` environment variable:
 
-### Changing Check Interval
-
-Set environment variable:
 ```bash
-export CHECK_INTERVAL_MINUTES=15  # Check every 15 minutes
+# Default furniture keywords
+SEARCH_KEYWORDS=стеллаж,стелаж,журнальный,столик,зеркало
+
+# Add electronics keywords
+SEARCH_KEYWORDS=iPhone,Samsung,ноутбук,компьютер
+
+# Mix categories
+SEARCH_KEYWORDS=стеллаж,iPhone,велосипед
 ```
+
+### Check Interval
+
+Change how often the bot checks for new items:
+
+```bash
+CHECK_INTERVAL_MINUTES=15  # Check every 15 minutes
+CHECK_INTERVAL_MINUTES=60  # Check every hour
+```
+
+### Target URL
+
+Monitor different marketplace categories:
+
+```bash
+# Default furniture category
+YARMARKA_URL=https://yarmarka.ge/goods/c_2438/0/0?sort=new
+
+# Electronics category (example)
+YARMARKA_URL=https://yarmarka.ge/goods/c_1234/0/0?sort=new
+```
+
+## Development
 
 ## License
 

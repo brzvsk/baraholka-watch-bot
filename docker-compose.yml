@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  baraholka-bot:
+    build: .
+    container_name: baraholka-watch-bot
+    restart: unless-stopped
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - CHAT_ID=${CHAT_ID}
+      - CHECK_INTERVAL_MINUTES=${CHECK_INTERVAL_MINUTES:-30}
+      - YARMARKA_URL=${YARMARKA_URL:-https://yarmarka.ge/goods/c_2438/0/0?sort=new}
+    volumes:
+      # Mount data directory for persistent state storage
+      - bot_data:/app/data
+      # Mount logs for external access
+      - ./logs:/app/logs
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.path.append('/app/src'); from telegram_bot import TelegramNotifierSync; import os; bot = TelegramNotifierSync(os.getenv('BOT_TOKEN'), os.getenv('CHAT_ID')); exit(0 if bot.test_connection() else 1)"]
+      interval: 5m
+      timeout: 30s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  bot_data:
+    driver: local

@@ -16,7 +16,7 @@ A Telegram bot that monitors yarmarka.ge for specific furniture items and sends 
 
 ```bash
 BOT_TOKEN=8045994724:AAECxH8TtK_fYiaTXwPv7ACzBf0xRht2AIY
-CHAT_ID=8187426762
+CHAT_ID=4938173866
 CHECK_INTERVAL_MINUTES=30
 YARMARKA_URL=https://yarmarka.ge/goods/c_2438/0/0?sort=new
 ```
@@ -72,7 +72,7 @@ YARMARKA_URL=https://yarmarka.ge/goods/c_2438/0/0?sort=new
 #### Environment Variables to Set in Coolify:
 ```
 BOT_TOKEN=8045994724:AAECxH8TtK_fYiaTXwPv7ACzBf0xRht2AIY
-CHAT_ID=8187426762
+CHAT_ID=4938173866
 CHECK_INTERVAL_MINUTES=30
 ```
 
